@@ -115,10 +115,19 @@ public:
 
   bool begin(int32_t speed = GFX_NOT_DEFINED);
 
+  // Deletes the esp_lcd RGB panel created by getFrameBuffer(), freeing its
+  // frame buffer and the RGB panel slot so a new panel can be created.
+  // The pointer getFrameBuffer() returned is invalid afterwards: stop
+  // drawing to any display using this panel (or begin() it again) first.
+  void end();
+
   bool isUseBigEndian() {
     return _useBigEndian;
   }
 
+  // Creates the esp_lcd RGB panel and returns its frame buffer. Calling it
+  // again first releases the previous panel (see end()), invalidating the
+  // frame buffer it returned before.
   uint16_t *getFrameBuffer(int16_t w, int16_t h);
 
 protected:
