@@ -24,6 +24,20 @@ Arduino_ESP32RGBPanel::Arduino_ESP32RGBPanel(
 {
 }
 
+Arduino_ESP32RGBPanel::~Arduino_ESP32RGBPanel()
+{
+  end();
+}
+
+void Arduino_ESP32RGBPanel::end()
+{
+  if (_panel_handle)
+  {
+    esp_lcd_panel_del(_panel_handle);
+    _panel_handle = NULL;
+  }
+}
+
 bool Arduino_ESP32RGBPanel::begin(int32_t speed)
 {
   if (speed == GFX_NOT_DEFINED)
@@ -44,6 +58,9 @@ bool Arduino_ESP32RGBPanel::begin(int32_t speed)
 
 uint16_t *Arduino_ESP32RGBPanel::getFrameBuffer(int16_t w, int16_t h)
 {
+  // Only one RGB panel can exist at a time: release any previous one first.
+  end();
+
   esp_lcd_rgb_panel_config_t panel_config = {
 #if (!defined(ESP_ARDUINO_VERSION_MAJOR)) || (ESP_ARDUINO_VERSION_MAJOR < 3)
       .clk_src = LCD_CLK_SRC_PLL160M,
