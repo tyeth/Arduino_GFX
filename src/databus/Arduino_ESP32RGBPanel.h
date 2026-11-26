@@ -123,12 +123,24 @@ public:
       uint16_t pclk_active_neg = 0, int32_t prefer_speed = GFX_NOT_DEFINED, bool useBigEndian = false,
       uint16_t de_idle_high = 0, uint16_t pclk_idle_high = 0, size_t bounce_buffer_size_px = 0);
 
+  // Deletes the esp_lcd RGB panel (see del()).
+  ~Arduino_ESP32RGBPanel();
+
   bool begin(int32_t speed = GFX_NOT_DEFINED);
+
+  // Deletes the esp_lcd RGB panel created by getFrameBuffer(), freeing its
+  // frame buffer and the RGB panel slot so a new panel can be created. The
+  // pointer getFrameBuffer() returned is invalid afterwards: stop drawing to
+  // any display using this panel first.
+  void del();
 
   bool isUseBigEndian() {
     return _useBigEndian;
   }
 
+  // Creates the esp_lcd RGB panel and returns its frame buffer. If the panel
+  // already exists (e.g. the display's begin() is called again), returns
+  // its existing frame buffer instead of creating a second one.
   uint16_t *getFrameBuffer(int16_t w, int16_t h);
 
 protected:
@@ -152,6 +164,8 @@ private:
   uint16_t _de_idle_high;
   uint16_t _pclk_idle_high;
   size_t _bounce_buffer_size_px;
+
+  uint16_t *panelFrameBuffer();
 
   esp_lcd_panel_handle_t _panel_handle = NULL;
 };
